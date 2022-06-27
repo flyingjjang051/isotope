@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GALLERY</title>
+    <link rel="stylesheet" href="css/reset.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700;900&family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <script src="js/dayjs.min.js"></script>
+    <script src="js/imagesloaded.pkgd.min.js"></script>
+    <script src="js/isotope.pkgd.min.js"></script>
+    <script src="js/greensock/gsap.min.js"></script>
+  </head>
+  <body>
+    <header id="header">
+      <h1><strong>GALLERY</strong></h1>
+    </header>
+    <main id="main">
+      <div id="search">
+        <input type="text" id="searchTxt" />
+        <button><span class="material-icons"> search </span></button>
+      </div>
+      <ul class="list">
+        <!-- <li>
+          <a href="">
+            <img src="" alt="" />
+            <div class="info">
+              <h2>제목이 들어갑니다.</h2>
+              <p>내용이 들어갑니다. 내용이 들어갑니다. 내용이 들어갑니다. 내용이 들어갑니다. 내용이 들어갑니다.</p>
+            </div>
+          </a>
+        </li> -->
+      </ul>
+    </main>
+  </body>
+  <script>
+    const list = $("#main .list");
+    const btnSearch = $("#search button");
+    const searchTxt = $("#searchTxt");
+    btnSearch.on("click", function () {
+      kakaoSearch(searchTxt.val());
+    });
+    const kakaoSearch = function (search) {
+      $.ajax({
+        url: "https://dapi.kakao.com/v2/search/image",
+        headers: {
+          Authorization: "KakaoAK 13215f3216644f68b281e1f7eda3b396",
+        },
+        data: {
+          query: search,
+          size: 20,
+        },
+      }).done(function (response) {
+        list.html("");
+        let tempHtml = "";
+        $.each(response.documents, function (idx, item) {
+          console.log(item);
+          const date = dayjs(item.datetime, "YYYY-MM-dd HH:mm:ss"); // 날짜를 하나 생성
+          tempHtml += `<li class="item">
+          <a href="">
+            <img src="${item.image_url}" alt="" />
+            <div class="info">
+              <p class="date">${date.format("YYYY/MM/DD HH:mm:ss")}</p>
+            </div>
+          </a>
+        </li>`;
+        });
+        //innerHtml = tempHtml
+        list.html(tempHtml);
+        list.imagesLoaded(function () {
+          list.isotope({
+            itemSelector: ".item",
+            percentPosition: true,
+          });
+        });
+      });
+    };
+    kakaoSearch("김태희");
+  </script>
+</html>
