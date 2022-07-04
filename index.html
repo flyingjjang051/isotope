@@ -4,7 +4,8 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- <meta name="referrer" content="no-referrer" /> -->
+    <meta name="referrer" content="no-referrer" />
+    <!-- 다른데서 넘어오는 데이터의 URL을 제거하겠다. -->
     <title>GALLERY</title>
     <link rel="stylesheet" href="css/reset.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -48,43 +49,44 @@
     </main>
   </body>
   <script>
+    let currentPage = 1;
     const list = $("#result .list");
     const recentSearchList = $("#recentSearch .list");
     let recentSearchArray = [];
     const btnSearch = $("#search button");
     const searchTxt = $("#searchTxt");
     const body = $("body");
+    let isLoaded = false;
     let parseData = JSON.parse(localStorage.getItem("recentSearchArray"));
     if (parseData !== null) {
       recentSearchArray = [...new Set(parseData)]; // 전지현,김태희,설현
     }
 
-    console.log("배열은 참조한다.===", recentSearchArray === parseData);
-    console.log("recentSearchArray.===", recentSearchArray);
-    const parseLocalStorage = function () {
+    const parseLocalStorage = function (parsingTxt) {
       localStorage.setItem("recentSearchArray", JSON.stringify(recentSearchArray));
       parseData = JSON.parse(localStorage.getItem("recentSearchArray"));
-      recentSearchArray = [...new Set(parseData)];
+      recentSearchArray = [...new Set(parseData)]; // 구조분해 할당
       let tempHtml = "";
       $.each(recentSearchArray, function (idx, item) {
-        tempHtml += `<li class="on" data-search="${item}">${item}</li>`;
+        if (parsingTxt === item) {
+          tempHtml += `<li class="on" data-search="${item}">${item}</li>`;
+        } else {
+          tempHtml += `<li data-search="${item}">${item}</li>`;
+        }
       });
       recentSearchList.html(tempHtml);
     };
     parseLocalStorage();
-    const gallery = list.isotope({
-      itemSelector: ".item",
-      percentPosition: true,
-    });
     btnSearch.on("click", function () {
-      kakaoSearch(searchTxt.val());
+      kakaoSearch(searchTxt.val(), currentPage);
     });
     searchTxt.on("keydown", function (e) {
       if (e.keyCode === 13) {
-        kakaoSearch(searchTxt.val());
+        kakaoSearch(searchTxt.val(), currentPage);
       }
     });
-    const kakaoSearch = function (search) {
+    const kakaoSearch = function (search, currentPage = 1) {
+      isLoaded = false;
       $.ajax({
         url: "https://dapi.kakao.com/v2/search/image",
         headers: {
@@ -92,11 +94,12 @@
         },
         data: {
           query: search,
-          size: 20,
+          size: 40,
+          page: currentPage,
         },
       }).done(function (response) {
-        recentSearchArray.push(searchTxt.val());
-        parseLocalStorage();
+        recentSearchArray.push(search);
+        parseLocalStorage(search);
         let tempHtml = "";
         $.each(response.documents, function (idx, item) {
           //console.log(item);
@@ -110,7 +113,7 @@
           </a>
         </li>`;
         });
-        list.html(tempHtml);
+        list.append(tempHtml);
         list.imagesLoaded().progress(function (instance, image) {
           list.isotope({
             itemSelector: ".item",
@@ -118,13 +121,28 @@
           });
           list.isotope("reloadItems");
         });
+        list.imagesLoaded().always(function () {
+          isLoaded = true;
+        });
       });
     };
     //    kakaoSearch("김태희");
 
     $("#recentSearch .list").on("click", "li", function () {
       $(this).addClass("on").siblings().removeClass("on");
-      kakaoSearch($(this).data("search"));
+      kakaoSearch($(this).data("search"), currentPage);
     });
+
+    $(window).on("scroll", function (e) {
+      const st = $(window).scrollTop(); // 스크롤의 위치값;
+      //console.log($(window).height(), "====", $(document).height());
+      if (st + $(window).height() >= $(document).height() && isLoaded) {
+        //console.log("바닥에 닿았다");
+        currentPage++;
+        kakaoSearch(searchTxt.val(), currentPage);
+      }
+    });
+    // 스크롤바가 바닥에 닿았을때
+    //kakaoSearch($(this).data("search"),currentPage+1);
   </script>
 </html>
