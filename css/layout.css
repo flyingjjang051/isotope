@@ -63,11 +63,12 @@ a {
 #main #search button span {
   font-size: 48px;
 }
-#main .list {
+
+#result .list {
   display: flex;
   flex-wrap: wrap;
 }
-#main .list li {
+#result .list li {
   padding: 10px;
   background-color: #fff;
   margin: 10px;
@@ -75,9 +76,23 @@ a {
   box-sizing: border-box;
   box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.3);
 }
-#main .list li img {
+#result .list li img {
   width: 100%;
 }
-#main .list li .date {
+#result .list li .date {
   margin-top: 10px;
+}
+
+#recentSearch .list {
+  display: flex;
+  flex-wrap: wrap;
+}
+#recentSearch .list li {
+  padding: 20px 50px;
+  border-radius: 100px;
+  border: 2px solid #fff;
+  color: #fff;
+  margin: 10px;
+  box-sizing: border-box;
+  box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.3);
 }

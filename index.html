@@ -50,10 +50,23 @@
   <script>
     const list = $("#result .list");
     const recentSearchList = $("#recentSearch .list");
-    const recentSearchArray = [];
+    let recentSearchArray = [];
     const btnSearch = $("#search button");
     const searchTxt = $("#searchTxt");
     const body = $("body");
+    let parseData = JSON.parse(localStorage.getItem("recentSearchArray"));
+    if (parseData !== null) {
+      recentSearchArray = parseData;
+    }
+    console.log("배열은 참조한다.===", recentSearchArray === parseData);
+    const parseLocalStorage = function () {
+      let tempHtml = "";
+      $.each(recentSearchArray, function (idx, item) {
+        tempHtml += `<li>${item}</li>`;
+      });
+      recentSearchList.html(tempHtml);
+    };
+    parseLocalStorage();
     const gallery = list.isotope({
       itemSelector: ".item",
       percentPosition: true,
@@ -78,9 +91,8 @@
         },
       }).done(function (response) {
         recentSearchArray.push(searchTxt.val());
-        const tempData = JSON.parse(localStorage.getItem("recentSearchArray"));
-        console.log(typeof tempData);
         localStorage.setItem("recentSearchArray", JSON.stringify(recentSearchArray));
+        parseLocalStorage();
         console.log(recentSearchArray);
 
         let tempHtml = "";

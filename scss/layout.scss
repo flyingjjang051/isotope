@@ -71,6 +71,9 @@ a {
       }
     }
   }
+}
+
+#result {
   .list {
     display: flex;
     flex-wrap: wrap;
@@ -87,6 +90,21 @@ a {
       .date {
         margin-top: 10px;
       }
+    }
+  }
+}
+#recentSearch {
+  .list {
+    display: flex;
+    flex-wrap: wrap;
+    li {
+      padding: 20px 50px;
+      border-radius: 100px;
+      border: 2px solid #fff;
+      color: #fff;
+      margin: 10px;
+      box-sizing: border-box;
+      box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.3);
     }
   }
 }
