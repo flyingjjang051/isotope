@@ -78,10 +78,12 @@
     };
     parseLocalStorage();
     btnSearch.on("click", function () {
+      list.html("");
       kakaoSearch(searchTxt.val(), currentPage);
     });
     searchTxt.on("keydown", function (e) {
       if (e.keyCode === 13) {
+        list.html("");
         kakaoSearch(searchTxt.val(), currentPage);
       }
     });
@@ -101,6 +103,7 @@
         recentSearchArray.push(search);
         parseLocalStorage(search);
         let tempHtml = "";
+        //list.html("");
         $.each(response.documents, function (idx, item) {
           //console.log(item);
           const date = dayjs(item.datetime, "YYYY-MM-dd HH:mm:ss"); // 날짜를 하나 생성
@@ -114,21 +117,22 @@
         </li>`;
         });
         list.append(tempHtml);
-        list.imagesLoaded().progress(function (instance, image) {
+        list.imagesLoaded().progress(function (instance, image) {});
+        list.imagesLoaded().always(function () {
+          isLoaded = true;
           list.isotope({
             itemSelector: ".item",
             percentPosition: true,
           });
           list.isotope("reloadItems");
         });
-        list.imagesLoaded().always(function () {
-          isLoaded = true;
-        });
       });
     };
     //    kakaoSearch("김태희");
 
     $("#recentSearch .list").on("click", "li", function () {
+      list.html("");
+      searchTxt.val($(this).data("search"));
       $(this).addClass("on").siblings().removeClass("on");
       kakaoSearch($(this).data("search"), currentPage);
     });
@@ -141,7 +145,9 @@
         currentPage++;
         kakaoSearch(searchTxt.val(), currentPage);
       }
+      console.log(document.body.clientHeight, "======", document.body.scrollHeight);
     });
+
     // 스크롤바가 바닥에 닿았을때
     //kakaoSearch($(this).data("search"),currentPage+1);
   </script>
