@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- <meta name="referrer" content="no-referrer" /> -->
     <title>GALLERY</title>
     <link rel="stylesheet" href="css/reset.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -28,30 +29,41 @@
         <input type="text" id="searchTxt" />
         <button><span class="material-icons"> search </span></button>
       </div>
-      <ul class="list">
-        <!-- <li>
-          <a href="">
-            <img src="" alt="" />
-            <div class="info">
-              <h2>제목이 들어갑니다.</h2>
-              <p>내용이 들어갑니다. 내용이 들어갑니다. 내용이 들어갑니다. 내용이 들어갑니다. 내용이 들어갑니다.</p>
-            </div>
-          </a>
-        </li> -->
-      </ul>
+      <div id="recentSearch">
+        <ul class="list"></ul>
+      </div>
+      <div id="result">
+        <ul class="list">
+          <!-- <li>
+            <a href="">
+              <img src="" alt="" />
+              <div class="info">
+                <h2>제목이 들어갑니다.</h2>
+                <p>내용이 들어갑니다. 내용이 들어갑니다. 내용이 들어갑니다. 내용이 들어갑니다. 내용이 들어갑니다.</p>
+              </div>
+            </a>
+          </li> -->
+        </ul>
+      </div>
     </main>
   </body>
   <script>
-    const list = $("#main .list");
+    const list = $("#result .list");
+    const recentSearchList = $("#recentSearch .list");
+    const recentSearchArray = [];
     const btnSearch = $("#search button");
     const searchTxt = $("#searchTxt");
     const body = $("body");
+    const gallery = list.isotope({
+      itemSelector: ".item",
+      percentPosition: true,
+    });
     btnSearch.on("click", function () {
-      kakaoSearch(searchTxt.val());
+      kakaoSearch({ search: searchTxt.val(), page: 2 });
     });
     searchTxt.on("keydown", function (e) {
       if (e.keyCode === 13) {
-        kakaoSearch(searchTxt.val());
+        kakaoSearch({ search: searchTxt.val(), page: 2 });
       }
     });
     const kakaoSearch = function (search) {
@@ -65,6 +77,12 @@
           size: 20,
         },
       }).done(function (response) {
+        recentSearchArray.push(searchTxt.val());
+        const tempData = JSON.parse(localStorage.getItem("recentSearchArray"));
+        console.log(typeof tempData);
+        localStorage.setItem("recentSearchArray", JSON.stringify(recentSearchArray));
+        console.log(recentSearchArray);
+
         let tempHtml = "";
         $.each(response.documents, function (idx, item) {
           //console.log(item);
@@ -79,12 +97,21 @@
         </li>`;
         });
         //innerHtml = tempHtml
-        list.html(tempHtml);
-        list.imagesLoaded(function () {
-          list.isotope({
-            itemSelector: ".item",
-            percentPosition: true,
-          });
+        list.append(tempHtml);
+        // list.imagesLoaded().progress(function (instance, image) {
+        //   list.isotope({
+        //     itemSelector: ".item",
+        //     percentPosition: true,
+        //   });
+        //   list.isotope("reloadItems");
+        // });
+        // list.imagesLoaded().always(function (instance) {
+        //   console.log(instance);
+        //   gallery.isotope("");
+        // });
+        list.isotope({
+          itemSelector: ".item",
+          percentPosition: true,
         });
       });
     };
