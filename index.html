@@ -59,11 +59,11 @@
       percentPosition: true,
     });
     btnSearch.on("click", function () {
-      kakaoSearch({ search: searchTxt.val(), page: 2 });
+      kakaoSearch(searchTxt.val());
     });
     searchTxt.on("keydown", function (e) {
       if (e.keyCode === 13) {
-        kakaoSearch({ search: searchTxt.val(), page: 2 });
+        kakaoSearch(searchTxt.val());
       }
     });
     const kakaoSearch = function (search) {
@@ -96,22 +96,13 @@
           </a>
         </li>`;
         });
-        //innerHtml = tempHtml
-        list.append(tempHtml);
-        // list.imagesLoaded().progress(function (instance, image) {
-        //   list.isotope({
-        //     itemSelector: ".item",
-        //     percentPosition: true,
-        //   });
-        //   list.isotope("reloadItems");
-        // });
-        // list.imagesLoaded().always(function (instance) {
-        //   console.log(instance);
-        //   gallery.isotope("");
-        // });
-        list.isotope({
-          itemSelector: ".item",
-          percentPosition: true,
+        list.html(tempHtml);
+        list.imagesLoaded().progress(function (instance, image) {
+          list.isotope({
+            itemSelector: ".item",
+            percentPosition: true,
+          });
+          list.isotope("reloadItems");
         });
       });
     };
