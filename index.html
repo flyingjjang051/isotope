@@ -61,6 +61,11 @@
     if (parseData !== null) {
       recentSearchArray = [...new Set(parseData)]; // 전지현,김태희,설현
     }
+    const grid = list.isotope({
+      itemSelector: ".item",
+      percentPosition: true,
+    });
+    console.log(grid === list);
 
     const parseLocalStorage = function (parsingTxt) {
       localStorage.setItem("recentSearchArray", JSON.stringify(recentSearchArray));
@@ -107,7 +112,8 @@
         $.each(response.documents, function (idx, item) {
           //console.log(item);
           const date = dayjs(item.datetime, "YYYY-MM-dd HH:mm:ss"); // 날짜를 하나 생성
-          tempHtml += `<li class="item">
+          // opacity 0으로 세팅
+          tempHtml += `<li class="item item${currentPage}" style="opacity:0">
           <a href="${item.image_url}" data-fancybox="image">
             <img src="${item.image_url}" alt="" />
             <div class="info">
@@ -116,7 +122,14 @@
           </a>
         </li>`;
         });
-        list.append(tempHtml);
+        // dom에 추가
+        //list.append(tempHtml)
+        // isotope에 추가된 아이템 있다고 알림
+        //list.isotope("appended", tempHtml)
+        // 추가된 html을 다시 load
+        //list.isotope("reloadItems")
+
+        list.append(tempHtml).isotope("appended", tempHtml).isotope("reloadItems");
         list.imagesLoaded().progress(function (instance, image) {});
         list.imagesLoaded().always(function () {
           isLoaded = true;
@@ -125,6 +138,8 @@
             percentPosition: true,
           });
           list.isotope("reloadItems");
+          console.log($(tempHtml));
+          gsap.to(`.item${currentPage}`, { opacity: 1, stagger: 0.1, delay: 0.5 });
         });
       });
     };
@@ -141,7 +156,7 @@
       const st = $(window).scrollTop(); // 스크롤의 위치값;
       //console.log($(window).height(), "====", $(document).height());
       if (st + $(window).height() >= $(document).height() && isLoaded) {
-        //console.log("바닥에 닿았다");
+        console.log("바닥에 닿았다");
         currentPage++;
         kakaoSearch(searchTxt.val(), currentPage);
       }
