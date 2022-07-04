@@ -56,10 +56,13 @@
     const body = $("body");
     let parseData = JSON.parse(localStorage.getItem("recentSearchArray"));
     if (parseData !== null) {
-      recentSearchArray = parseData;
+      recentSearchArray = [...new Set(parseData)]; // 전지현,김태희,설현
     }
+
     console.log("배열은 참조한다.===", recentSearchArray === parseData);
+    console.log("recentSearchArray.===", recentSearchArray);
     const parseLocalStorage = function () {
+      recentSearchArray = [...new Set(parseData)];
       let tempHtml = "";
       $.each(recentSearchArray, function (idx, item) {
         tempHtml += `<li>${item}</li>`;
